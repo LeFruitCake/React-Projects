@@ -1,5 +1,5 @@
 .colorBox{
-    width: 200px;
-    height: 200px;
     border: solid 1px black;
+    height: 160px;
+    width: 200px;
 }
