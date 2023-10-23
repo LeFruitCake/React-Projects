@@ -1,5 +1,52 @@
-.colorBox{
+.container{
+    width: 1000px;
+    height: 600px;
+    /* border: solid 1px black; */
+    /* background-color: darkslateblue; */
+    padding: 10rem;
+    justify-content: center;
+}
+
+.ui-container{
+    text-align: center;
+}
+
+.bingo-grid{
     border: solid 1px black;
-    height: 160px;
-    width: 200px;
+    height: 460px;
+    width: 500px;
+    padding: 1rem;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.bingo-box{
+    margin-left: 5px;
+    border: solid 1px black;
+    width: 90px;
+    height: 80px;
+    display: inline-block;
+    text-align: center;
+    align-items: center;
+    font-size: 50px;
+}
+
+.bingo{
+    font-size: 50px;
+    margin-left: 5px;
+}
+
+h1{
+    margin-left: 400px;
+}
+a{
+    margin-left:330px;
+}
+
+.btn-changecode{
+    margin-left: 400px;
+}
+
+.second-container{
+    margin: 0 auto;
 }

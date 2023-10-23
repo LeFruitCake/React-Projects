@@ -1,92 +1,98 @@
-import React from 'react';
-import './App.css';
-import {Grid} from '@mui/material';
-import { useState } from 'react';
+import './App.css'
+import { useState } from 'react'
+import axios from 'axios';
+
 
 export default function App(){
-    var [counter,setCounter] = useState(0);
-    const winningSequence = [6,4,1,2,8,3,7,5,0];
-    const [colorControl,setColorControl] = useState([false,false,false,false,false,false,false,false,false]);
-    const [sequence,setSequence] = useState([0,0,0,0,0,0,0,0,0]);
-    const colors = ["aquamarine","blue","yellow","orange","red","green","purple","chartreuse","sienna"];
-    const onEnter = (val) =>{
-        document.getElementById("Box"+val).style.backgroundColor = colors[val];
-    }
-    const onExit = val =>{
-        if(!colorControl[val]){
-            document.getElementById("Box"+val).style.backgroundColor = "white";
-        }
-    }
-    // const resetGame = () =>{
+    const [gamecode,setGameCode] = useState("");
+    const [flag,setFlag] = useState(false);
+    const [gamecard,setGameCard] = useState();
+    const [token,setToken] = useState();
 
-        
-    // }
-    const resetter = ()=>{
-        setCounter(0);
-        setSequence([0,0,0,0,0,0,0,0,0]);
-        for(var i = 0;i<9;i++){
-            document.getElementById("Box"+i).style.backgroundColor = "white";
-        }
-        setColorControl([false,false,false,false,false,false,false,false,false]);
-    }
-    const clickerHandler = val =>{
-        if(counter>-1 && counter <9){
-            document.getElementById("Box"+val).style.backgroundColor = colors[val];
-            var tempcontrol =[...colorControl];
-            tempcontrol[val] = true;
-            setColorControl([...tempcontrol]);
-            const temp = [...sequence];
-            temp[counter]=val;
-            setSequence([...temp]);
-            if(counter<=8){
-                console.log("ctr= "+counter);
-                if(counter===8){
-                    alert("Congratulations!");
-                    setCounter(9);
-                }else{
-                    if(temp[counter]!==winningSequence[counter]){
-                        resetter();
-                    }else{
-                        setCounter(counter+1);
-                    }
-                }
+    const getCard =()=>{
+        axios.post(`http://www.hyeumine.com/getcard.php?bcode=${gamecode}`).then(response=>{
+            if(!(response.status===200 && response.statusText==="OK")){
+                setFlag(false)
+                
+            }else if(response.data !== 0){
+                console.log("gone here")
+                setFlag(true);
+                setGameCard(response.data.card)
+                setToken(response.data.playcard_token)
+            }else{
+                alert("Game code not found")
             }
-        }
+            
+            
+        })
+        .catch(error => {
+            console.error("Problem with get operation",error)
+        });
     }
 
-    return (
-        <Grid container sx={{margin:'0 auto',width:600}}>
-            <Grid item xs={12}>
-                <div style={{backgroundColor:colors[winningSequence[0]],width:'50px',height:'50px',border:'solid 1px black',display:'inline-block',marginLeft:'50px'}}></div>
-                <div style={{backgroundColor:colors[winningSequence[1]],width:'50px',height:'50px',border:'solid 1px black',display:'inline-block'}}></div>
-                <div style={{backgroundColor:colors[winningSequence[2]],width:'50px',height:'50px',border:'solid 1px black',display:'inline-block'}}></div>
-                <div style={{backgroundColor:colors[winningSequence[3]],width:'50px',height:'50px',border:'solid 1px black',display:'inline-block'}}></div>
-                <div style={{backgroundColor:colors[winningSequence[4]],width:'50px',height:'50px',border:'solid 1px black',display:'inline-block'}}></div>
-                <div style={{backgroundColor:colors[winningSequence[5]],width:'50px',height:'50px',border:'solid 1px black',display:'inline-block'}}></div>
-                <div style={{backgroundColor:colors[winningSequence[6]],width:'50px',height:'50px',border:'solid 1px black',display:'inline-block'}}></div>
-                <div style={{backgroundColor:colors[winningSequence[7]],width:'50px',height:'50px',border:'solid 1px black',display:'inline-block'}}></div>
-                <div style={{backgroundColor:colors[winningSequence[8]],width:'50px',height:'50px',border:'solid 1px black',display:'inline-block'}}></div>
-            </Grid>
-            <Grid item xs={4}><Colorbox id={0} whileHovered={()=>{onEnter(0)}} whileLeave={()=>{onExit(0)}} whileClicked = {()=>{clickerHandler(0)}} ></Colorbox></Grid>
-            <Grid item xs={4}><Colorbox id={1} whileHovered={()=>{onEnter(1)}} whileLeave={()=>{onExit(1)}} whileClicked = {()=>{clickerHandler(1)}} ></Colorbox></Grid>
-            <Grid item xs={4}><Colorbox id={2} whileHovered={()=>{onEnter(2)}} whileLeave={()=>{onExit(2)}} whileClicked = {()=>{clickerHandler(2)}} ></Colorbox></Grid>
-            <Grid item xs={4}><Colorbox id={3} whileHovered={()=>{onEnter(3)}} whileLeave={()=>{onExit(3)}} whileClicked = {()=>{clickerHandler(3)}} ></Colorbox></Grid>
-            <Grid item xs={4}><Colorbox id={4} whileHovered={()=>{onEnter(4)}} whileLeave={()=>{onExit(4)}} whileClicked = {()=>{clickerHandler(4)}} ></Colorbox></Grid>
-            <Grid item xs={4}><Colorbox id={5} whileHovered={()=>{onEnter(5)}} whileLeave={()=>{onExit(5)}} whileClicked = {()=>{clickerHandler(5)}} ></Colorbox></Grid>
-            <Grid item xs={4}><Colorbox id={6} whileHovered={()=>{onEnter(6)}} whileLeave={()=>{onExit(6)}} whileClicked = {()=>{clickerHandler(6)}} ></Colorbox></Grid>
-            <Grid item xs={4}><Colorbox id={7} whileHovered={()=>{onEnter(7)}} whileLeave={()=>{onExit(7)}} whileClicked = {()=>{clickerHandler(7)}} ></Colorbox></Grid>
-            <Grid item xs={4}><Colorbox id={8} whileHovered={()=>{onEnter(8)}} whileLeave={()=>{onExit(8)}} whileClicked = {()=>{clickerHandler(8)}} ></Colorbox></Grid>
-            <Grid item xs={12}><button className='btn' onClick={resetter}> Reset Game</button></Grid>
-        </Grid>
-    );
-}
+    const checkWin = ()=>{
+        axios.get(`http://www.hyeumine.com/checkwin.php?playcard_token=${token}`).then(response=>{
+            if(response.data === 1){
+                alert("Congrats you win");
+            }else{
+                alert("Not yet")
+            }
+        })
+    }
 
+    
 
-function Colorbox(props){
-    return (
-
-        <div id = {"Box"+props.id} onMouseEnter={props.whileHovered} onMouseLeave={props.whileLeave} onClick={props.whileClicked} className='colorBox'></div>
-
-
+    return(
+        <>
+            {!flag?
+                <div className="container">
+                <div className="ui-container">
+                    
+                    <h3>Enter your game code here</h3>
+                    
+                    <input type='text' name='gamecard' onChange={(e)=>{setGameCode(e.target.value)}} placeholder='Game Code'></input>
+                    <br></br>
+                    <br/>
+                    <button onClick={getCard}>Get Card</button>
+                </div>
+            </div>:<>
+                <div className='second-container'>
+                    <h1>Game Code: {gamecode}</h1>
+                    <button className='btn-changecode' onClick={()=>{setFlag(false)}}>Change Code</button>
+                    <a href={`http://www.hyeumine.com/bingodashboard.php?bcode=${gamecode}`} target='_blank'>Open Dashboard</a>
+                    <div className='bingo-grid'>
+                        <div className='bingo'>BINGO</div>
+                        <div id='B1' className='bingo-box'>{gamecard.B[0]}</div>
+                        <div id='I1' className='bingo-box'>{gamecard.I[0]}</div>
+                        <div id='N1' className='bingo-box'>{gamecard.N[0]}</div>
+                        <div id='G1' className='bingo-box'>{gamecard.G[0]}</div>
+                        <div id='O1' className='bingo-box'>{gamecard.O[0]}</div>
+                        <div id='B2' className='bingo-box'>{gamecard.B[1]}</div>
+                        <div id='I2' className='bingo-box'>{gamecard.I[1]}</div>
+                        <div id='N2' className='bingo-box'>{gamecard.N[1]}</div>
+                        <div id='G2' className='bingo-box'>{gamecard.G[1]}</div>
+                        <div id='O2' className='bingo-box'>{gamecard.O[1]}</div>
+                        <div id='B3' className='bingo-box'>{gamecard.B[2]}</div>
+                        <div id='I3' className='bingo-box'>{gamecard.I[2]}</div>
+                        <div id='N3' className='bingo-box'>{gamecard.N[2]}</div>
+                        <div id='G3' className='bingo-box'>{gamecard.G[2]}</div>
+                        <div id='O3' className='bingo-box'>{gamecard.O[2]}</div>
+                        <div id='B4' className='bingo-box'>{gamecard.B[3]}</div>
+                        <div id='I4' className='bingo-box'>{gamecard.I[3]}</div>
+                        <div id='N4' className='bingo-box'>{gamecard.N[3]}</div>
+                        <div id='G4' className='bingo-box'>{gamecard.G[3]}</div>
+                        <div id='O4' className='bingo-box'>{gamecard.O[3]}</div>
+                        <div id='B5' className='bingo-box'>{gamecard.B[4]}</div>
+                        <div id='I5' className='bingo-box'>{gamecard.I[4]}</div>
+                        <div id='N5' className='bingo-box'>{gamecard.N[4]}</div>
+                        <div id='G5' className='bingo-box'>{gamecard.G[4]}</div>
+                        <div id='O5' className='bingo-box'>{gamecard.O[4]}</div>
+                    </div>
+                        
+                    <button className='btn-changecode' onClick={checkWin}>Check Win</button>
+                    <button style={{marginLeft:'380px'}} onClick={getCard}>New Card</button>
+                </div>
+            </>}
+        </>
     )
 }
