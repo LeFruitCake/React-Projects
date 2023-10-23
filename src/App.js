@@ -1,98 +1,114 @@
+import axios from "axios";
+import { useState } from "react";
 import './App.css'
-import { useState } from 'react'
-import axios from 'axios';
 
 
 export default function App(){
-    const [gamecode,setGameCode] = useState("");
-    const [flag,setFlag] = useState(false);
-    const [gamecard,setGameCard] = useState();
-    const [token,setToken] = useState();
+    
+    const [firstname,setFirstname] = useState();
+    const [lastname,setLastname] = useState();
+    const [uid,setUID] = useState();
+    const [note,setNote] = useState();
+    const [notes,setNotes] = useState([]);
+    const RegisterUser = () =>{
+    axios.post(`http://hyeumine.com/newuser.php`, {
+        firstname: firstname,
+        lastname: lastname,
+        }, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    }).then(response=>{
+        if(!(response.status===200 && response.statusText==="OK")){
+            console.log("Error post request")
+        }else if(response.data !== 0){
+            setUID(response.data.id)
+            console.log(response.data)
+        }else{
+            alert("Game code not found")
+        }
+    })
+    .catch(error => {
+        console.error("Problem with get operation",error)
+    });
+}
 
-    const getCard =()=>{
-        axios.post(`http://www.hyeumine.com/getcard.php?bcode=${gamecode}`).then(response=>{
-            if(!(response.status===200 && response.statusText==="OK")){
-                setFlag(false)
-                
-            }else if(response.data !== 0){
-                console.log("gone here")
-                setFlag(true);
-                setGameCard(response.data.card)
-                setToken(response.data.playcard_token)
-            }else{
-                alert("Game code not found")
+    const createNote = ()=>{
+        console.log(uid)
+        console.log(note)
+        axios.post(`http://hyeumine.com/newnote.php`, {
+            id: uid,
+            note: note,
+            }, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
-            
-            
+        }).then(response=>{
+            if(!(response.status===200 && response.statusText==="OK")){
+                console.log("Error post request")
+            }else{
+                axios.get('http://hyeumine.com/mynotes.php', {
+                    params: {
+                        id: uid 
+                    }
+                })
+                .then(response => {
+                    console.log(response.data); 
+                    setNotes(response.data.notes); 
+                    console.log(notes)
+                })
+                .catch(error => {
+                    console.error("Error in GET request:", error);
+                });
+            }
         })
         .catch(error => {
             console.error("Problem with get operation",error)
         });
     }
-
-    const checkWin = ()=>{
-        axios.get(`http://www.hyeumine.com/checkwin.php?playcard_token=${token}`).then(response=>{
-            if(response.data === 1){
-                alert("Congrats you win");
-            }else{
-                alert("Not yet")
-            }
-        })
-    }
-
-    
-
     return(
+        
         <>
-            {!flag?
-                <div className="container">
-                <div className="ui-container">
-                    
-                    <h3>Enter your game code here</h3>
-                    
-                    <input type='text' name='gamecard' onChange={(e)=>{setGameCode(e.target.value)}} placeholder='Game Code'></input>
-                    <br></br>
-                    <br/>
-                    <button onClick={getCard}>Get Card</button>
-                </div>
-            </div>:<>
-                <div className='second-container'>
-                    <h1>Game Code: {gamecode}</h1>
-                    <button className='btn-changecode' onClick={()=>{setFlag(false)}}>Change Code</button>
-                    <a href={`http://www.hyeumine.com/bingodashboard.php?bcode=${gamecode}`} target='_blank'>Open Dashboard</a>
-                    <div className='bingo-grid'>
-                        <div className='bingo'>BINGO</div>
-                        <div id='B1' className='bingo-box'>{gamecard.B[0]}</div>
-                        <div id='I1' className='bingo-box'>{gamecard.I[0]}</div>
-                        <div id='N1' className='bingo-box'>{gamecard.N[0]}</div>
-                        <div id='G1' className='bingo-box'>{gamecard.G[0]}</div>
-                        <div id='O1' className='bingo-box'>{gamecard.O[0]}</div>
-                        <div id='B2' className='bingo-box'>{gamecard.B[1]}</div>
-                        <div id='I2' className='bingo-box'>{gamecard.I[1]}</div>
-                        <div id='N2' className='bingo-box'>{gamecard.N[1]}</div>
-                        <div id='G2' className='bingo-box'>{gamecard.G[1]}</div>
-                        <div id='O2' className='bingo-box'>{gamecard.O[1]}</div>
-                        <div id='B3' className='bingo-box'>{gamecard.B[2]}</div>
-                        <div id='I3' className='bingo-box'>{gamecard.I[2]}</div>
-                        <div id='N3' className='bingo-box'>{gamecard.N[2]}</div>
-                        <div id='G3' className='bingo-box'>{gamecard.G[2]}</div>
-                        <div id='O3' className='bingo-box'>{gamecard.O[2]}</div>
-                        <div id='B4' className='bingo-box'>{gamecard.B[3]}</div>
-                        <div id='I4' className='bingo-box'>{gamecard.I[3]}</div>
-                        <div id='N4' className='bingo-box'>{gamecard.N[3]}</div>
-                        <div id='G4' className='bingo-box'>{gamecard.G[3]}</div>
-                        <div id='O4' className='bingo-box'>{gamecard.O[3]}</div>
-                        <div id='B5' className='bingo-box'>{gamecard.B[4]}</div>
-                        <div id='I5' className='bingo-box'>{gamecard.I[4]}</div>
-                        <div id='N5' className='bingo-box'>{gamecard.N[4]}</div>
-                        <div id='G5' className='bingo-box'>{gamecard.G[4]}</div>
-                        <div id='O5' className='bingo-box'>{gamecard.O[4]}</div>
-                    </div>
-                        
-                    <button className='btn-changecode' onClick={checkWin}>Check Win</button>
-                    <button style={{marginLeft:'380px'}} onClick={getCard}>New Card</button>
-                </div>
-            </>}
+          <div className="container">
+            <div className="sub-container">
+              <div className="Createnote">
+                  <h2>Create New Note</h2>
+                  <h3>Enter text:</h3>
+                  <textarea onChange={(e)=>setNote(e.target.value)}></textarea>
+                  <button onClick={createNote}>Create Note</button>
+              </div>
+              <div className="Createuser">
+                  <h2>Create New User</h2>
+                  <label>Enter firstname:</label>
+                  <input type='text' name='firstname' onChange={(e)=>setFirstname(e.target.value)}></input><br/>
+                  <label>Enter lastname:</label>
+                  <input type='text' name='lastname' onChange={(e)=>setLastname(e.target.value)}></input>
+                  <button onClick={RegisterUser}>Create User</button>
+              </div>
+              
+          </div>
+          <div className="Notes">
+              <h2>Notes</h2>
+              <div>
+                  {uid}
+              </div>
+              <h3>Search id</h3>
+              <input type='text'></input>
+              <div className="task">
+              {Array.isArray(notes) ? (
+                  notes.map((note, index) => (
+                      <div  key={index}>
+                      <h3>{note[0]}</h3>
+                      <h4>{note[1]}</h4>
+                      </div>
+                  ))
+                  ) : (
+                  <p>No notes available.</p>
+                  )}
+              </div>
+            </div>
+          </div>
         </>
+        
     )
 }
